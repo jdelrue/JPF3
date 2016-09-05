@@ -1,0 +1,20 @@
+{
+  "name": "xud/JPF3",
+  "description": "PHP framework with REST api focus",
+  "keywords": ["REST API", "framework"],
+  "license": "BSD-3-Clause",
+  "authors": [
+      {
+      "name": "Jonas Delrue",
+      "email": "delrue.jonas@gmail.com"
+    }
+  ],
+  "autoload": {
+        "psr-4": {
+            "JPF\\": "/"
+         }
+    },
+  "require": {
+    "php": ">=5.4.0"
+  }
+}
