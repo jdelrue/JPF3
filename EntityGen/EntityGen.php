@@ -9,6 +9,7 @@ require_once "Fetcher.php";
 require_once "Generator.php";
 
 class EntityGen {
+	private $entities;
 	public function __construct(){
 
 		$db = new \mysqli('localhost', 'root', '', 'test');
@@ -18,7 +19,7 @@ class EntityGen {
 		$scheme = $fetcher->Fetch("DB.SQL");
 
 		$generator = new Generator($scheme);
-		$generator->LoadEntitiesFromDbFile();
+		$this->entities = $generator->LoadEntitiesFromDbFile();
 	}
 
 
@@ -26,8 +27,8 @@ class EntityGen {
 		$myFile = $fileName;
 		$fh = fopen($myFile, 'w') or die("can't open file");
 		//echo $stringData;
-		fwrite($fh, $entityfile);
-		echo " Done !";
+		fwrite($fh, $this->entities);
+
 	}
 
 }

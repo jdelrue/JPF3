@@ -25,7 +25,7 @@ class Fetcher {
             $create = $this->GetCreateStatement($table);
             $sql .= $create;
         }
-        echo $sql;
+
         return  $sql;
     }
     private function GetCreateStatement($table)

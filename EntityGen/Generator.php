@@ -12,7 +12,7 @@ class Generator {
 
 	public function LoadEntitiesFromDbFile () {
 		$entities = Array();
-		$entityfile = "<?\n";
+		$entityfile = "<?php\nnamespace JPF\EntityGen;\n";
 		
 		$currentClass = "";
 		$first = true;
@@ -28,7 +28,6 @@ class Generator {
 			}
 			if (preg_match("/^.+AUTO_INCREMENT,$/", $line, $matches)) {
 				if (preg_match("/^\s+`+(\w+)`+ \w+/", $line, $matches)) {
-					echo $matches[1];
 					$regex .= "\"" . $matches[1] . "\",";
 				}
 			}
@@ -53,8 +52,7 @@ class Generator {
 		}
 		$entityfile .= "public static function getClass() { return __CLASS__; }\n";
 		$entityfile .= "}\n?>";
-		echo $entityfile;
-
+		return $entityfile;
 	}
 };
 
