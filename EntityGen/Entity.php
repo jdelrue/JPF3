@@ -120,7 +120,7 @@ abstract class Entity {
      */
 
     public function Delete() {
-        $mysqli = SQL_Connector::getMysqliInstance();
+        $mysqli = SqlConnector::getMysqliInstance();
         $sqlstr = "delete from $this->entityType where " . $this->getWhere();
 
         if (!$mysqli->query($sqlstr) && GlobalVars::getDebug()) {
@@ -134,7 +134,7 @@ abstract class Entity {
 
     public function Add() {
 
-        $mysqli = SQL_Connector::getMysqliInstance();
+        $mysqli = SqlConnector::getMysqliInstance();
         $sqlstr = "insert into `" . $this->entityType . "`(" . $this->GetNonNullFields() . ")" . " VALUES(" . $this->GetValues() . ")";
         //echo $sqlstr;
 
@@ -148,7 +148,7 @@ abstract class Entity {
     }
 
     public function Edit() {
-        $mysqli = SQL_Connector::getMysqliInstance();
+        $mysqli = SqlConnector::getMysqliInstance();
         $sqlstr = "update " . $this->entityType . " SET " . $this->GetUpdateList() . " WHERE " . $this->getWhere();
 
         if (!$mysqli->query($sqlstr) && GlobalVars::getDebug()) {
