@@ -73,6 +73,7 @@ abstract class Entity {
      */
 
     static function Select($args = "", $order = NULL, $limitor = "") {
+        $mysqli = SqlConnector::getMysqliInstance();
         $sqlstr = "Select * from `" . static::getClass() . "` $args";
         if (isset($order)) {
             $orderstr = $order->BuildOrder();
@@ -81,10 +82,11 @@ abstract class Entity {
        
         $record = "";
         $sqlstr .= " " . $limitor;
-        $sql = mysql_query($sqlstr) or die(mysql_error());
+        $sql = $mysqli->query($sqlstr) or die(mysqli_error());
+
         $ObjectRows = Array();
         $i = 0;
-        while ($record = mysql_fetch_object($sql)) {
+        while ($record = $mysqli->fetch_object($sql)) {
             $classname = static::getClass();
             $newObject = new $classname($record);
             if (!(isset($record->deleted) && $record->deleted != 1)) {
