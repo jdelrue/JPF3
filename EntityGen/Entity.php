@@ -2,9 +2,10 @@
 namespace JPF\EntityGen;
 abstract class Entity {
 
-    var $fields = Array();
-    var $entityType;
-    var $deleted;
+    private $fields = Array();
+    private $entityType;
+    private $deleted;
+
 
     /*
      * Following things can be passed to the constructor:
@@ -56,7 +57,6 @@ abstract class Entity {
             $i = 0;
             foreach ($this->fields as $key => $value) {
                 if ($i < func_num_args()) {
-
                     if ($this->checkRealColumn($value) && is_string($value)) {
                         //echo "**$value <br>";
                         $this->$value = func_get_arg($i);
@@ -67,6 +67,48 @@ abstract class Entity {
         }
     }
 
+    static function SelectColumns($columns, $args = "", $order = NULL, $limitor = "") {
+
+
+        $joins = "";
+        $newColumns = Array();
+        foreach($columns as $column){
+            if (strpos($column, ':') !== false) {
+                $seperated = explode(':', $column);
+                $tableName = str_replace("ID", "", $seperated[0]);
+                $idField = $tableName.".ID";
+                $joins .= sprintf(" join `%s` on %s = %s", $tableName, $seperated[0], $idField);
+                $fieldName = sprintf("%s.%s as %s%s",$tableName,$seperated[1], $tableName, $seperated[1]);
+                array_push($newColumns, $fieldName);
+            }else{
+                array_push($newColumns, $column);
+            }
+        }
+        $columnstring = implode(",", $newColumns);
+
+        $mysqli = SqlConnector::getMysqliInstance();
+        $sqlstr = sprintf("Select %s from `%s` %s %s",$columnstring,  basename(static::getClass()), $joins, $args);
+        //echo $sqlstr;
+        if (isset($order)) {
+
+            $orderstr = $order->BuildOrder();
+            $sqlstr = "select * from ($sqlstr) as t ORDER BY" . $orderstr;
+        }
+
+        $sqlstr .= " " . $limitor;
+        $sql = $mysqli->query($sqlstr) or die($mysqli->error);
+        $ObjectRows = Array();
+        $i = 0;
+        while ($record = $sql->fetch_object()) {
+            if (!(isset($record->deleted) && $record->deleted != 1)) {
+                $ObjectRows[$i] = $record;
+                $i += 1;
+            }
+        }
+        return $ObjectRows;
+
+
+    }
     /*
      * Get an array of objects from a table. This will create objects using the generated
      * entity classes.
@@ -74,7 +116,7 @@ abstract class Entity {
 
     static function Select($args = "", $order = NULL, $limitor = "") {
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = "Select * from `" . static::getClass() . "` $args";
+        $sqlstr = "Select * from `" . basename(static::getClass()) . "` $args";
         if (isset($order)) {
             $orderstr = $order->BuildOrder();
             $sqlstr = "select * from ($sqlstr) as t ORDER BY" . $orderstr;
@@ -82,11 +124,10 @@ abstract class Entity {
        
         $record = "";
         $sqlstr .= " " . $limitor;
-        $sql = $mysqli->query($sqlstr) or die(mysqli_error());
-
+        $sql = $mysqli->query($sqlstr) or die($mysqli->error);
         $ObjectRows = Array();
         $i = 0;
-        while ($record = $mysqli->fetch_object($sql)) {
+        while ($record = $sql->fetch_object()) {
             $classname = static::getClass();
             $newObject = new $classname($record);
             if (!(isset($record->deleted) && $record->deleted != 1)) {
@@ -94,10 +135,17 @@ abstract class Entity {
                 $i += 1;
             }
         }
-
         return $ObjectRows;
     }
+    static function SelectRaw($args = "", $order = NULL, $limitor = ""){
+        $objects = self::Select($args, $order, $limitor);
+        $rawObjects = array();
+        foreach($objects as $object){
+            array_push($rawObjects,$object->GetRawObject());
+        }
 
+        return $rawObjects;
+    }
     /*
      * Select one object from the database using the ID field.
      */
@@ -123,8 +171,8 @@ abstract class Entity {
 
     public function Delete() {
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = "delete from $this->entityType where " . $this->getWhere();
-
+        $sqlstr = "delete from ".basename($this->entityType)." where " . $this->getWhere();
+     
         if (!$mysqli->query($sqlstr) && GlobalVars::getDebug()) {
             echo $mysqli->error;
         }
@@ -137,12 +185,12 @@ abstract class Entity {
     public function Add() {
 
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = "insert into `" . $this->entityType . "`(" . $this->GetNonNullFields() . ")" . " VALUES(" . $this->GetValues() . ")";
-        //echo $sqlstr;
+        $sqlstr = "insert into `" . basename($this->entityType) . "`(" . $this->GetNonNullFields() . ")" . " VALUES(" . $this->GetValues() . ")";
 
         if (!$mysqli->query($sqlstr) && GlobalVars::getDebug()) {
             echo $mysqli->error;
         }
+
         if (property_exists(static::getClass(), "ID")) {
             $id = $mysqli->insert_id;
             $this->ID = $id;
@@ -170,7 +218,7 @@ abstract class Entity {
     }
     public function GetRawObject(){
         
-        $object = new stdClass();
+        $object = new \stdClass();
         foreach ($this->fields as $key => $value) {
             if ($this->checkRealColumn($value)) {
                 

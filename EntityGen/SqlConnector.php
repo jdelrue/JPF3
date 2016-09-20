@@ -12,7 +12,7 @@ class SqlConnector {
     var $MySQLHost;
     private static  $mysqli;
     private static $dbname;
-    function  SqlConnector ($MySQLHost, $MySQLUser, $MySQLPassword, $MySQLDatabase)
+    public function  __construct ($MySQLHost, $MySQLUser, $MySQLPassword, $MySQLDatabase)
     {
         $this->MySQLHost = $MySQLHost;
         $this->MySQLUser = $MySQLUser;
@@ -22,11 +22,11 @@ class SqlConnector {
      }
     function Connect(){
         //new way of connecting
-        $mysqli = new mysqli($this->MySQLHost , $this->MySQLUser,   $this->MySQLPassword, $this->MySQLDatabase);
+        $mysqli = new \mysqli($this->MySQLHost , $this->MySQLUser,   $this->MySQLPassword, $this->MySQLDatabase);
 //this should be deleted soon
-        $handle = mysql_connect($this->MySQLHost , $this->MySQLUser,   $this->MySQLPassword) 
-            or die("Connection Failure to Database");
-         mysql_select_db( $this->MySQLDatabase, $handle) or die("Cannot select database");
+       // $handle = mysql_connect($this->MySQLHost , $this->MySQLUser,   $this->MySQLPassword) 
+         //   or die("Connection Failure to Database");
+         //mysql_select_db( $this->MySQLDatabase, $handle) or die("Cannot select database");
          self::$mysqli = $mysqli;
         return $mysqli;
     }

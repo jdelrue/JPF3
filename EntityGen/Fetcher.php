@@ -14,6 +14,7 @@ class Fetcher {
 
        
         $stringData =  $this->GetStructure();
+        echo $stringData;
         return $stringData;
     }
     private function GetStructure(){

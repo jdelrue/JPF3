@@ -12,7 +12,7 @@ class EntityGen {
 	private $entities;
 	public function __construct(){
 
-		$db = new \mysqli('localhost', 'root', '', 'test');
+		$db = new \mysqli('oostfact-01', 'toor', '221662', 'artag8');
 
 		$fetcher = new Fetcher($db);
 
@@ -26,13 +26,14 @@ class EntityGen {
 	public function WriteToFile($fileName){
 		$myFile = $fileName;
 		$fh = fopen($myFile, 'w') or die("can't open file");
-		//echo $stringData;
+	
 		fwrite($fh, $this->entities);
 
 	}
 
 }
 $entityGen = new EntityGen();
+
 $entityGen->WriteToFile("MySQL-Entities.php");
 
 ?>
