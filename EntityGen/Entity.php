@@ -187,7 +187,7 @@ abstract class Entity {
         $mysqli = SqlConnector::getMysqliInstance();
         $sqlstr = "insert into `" . basename($this->entityType) . "`(" . $this->GetNonNullFields() . ")" . " VALUES(" . $this->GetValues() . ")";
 
-        if (!$mysqli->query($sqlstr) && GlobalVars::getDebug()) {
+        if (!$mysqli->query($sqlstr)) {
             echo $mysqli->error;
         }
 
@@ -199,9 +199,9 @@ abstract class Entity {
 
     public function Edit() {
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = "update " . $this->entityType . " SET " . $this->GetUpdateList() . " WHERE " . $this->getWhere();
+        $sqlstr = "update " . basename($this->entityType) . " SET " . $this->GetUpdateList() . " WHERE " . $this->getWhere();
 
-        if (!$mysqli->query($sqlstr) && GlobalVars::getDebug()) {
+        if (!$mysqli->query($sqlstr)) {
             echo $mysqli->error;
         }
     }

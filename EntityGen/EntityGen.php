@@ -12,7 +12,7 @@ class EntityGen {
 	private $entities;
 	public function __construct(){
 
-		$db = new \mysqli('oostfact-01', 'toor', '221662', 'artag8');
+		$db = new \mysqli('oostfact-01', 'toor', '221662', 'artag8-test');
 
 		$fetcher = new Fetcher($db);
 

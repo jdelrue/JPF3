@@ -8,11 +8,12 @@ class Template {
     var $blocks; //Array with blocks
     var $content; //Content of the file read
 
-    function Template($file){
-       $this->content=file_get_contents(Globals::$project_path.$file);
+    public function __construct($file){
+       $this->content=file_get_contents($file);
+
     }
     function AddFile($file){
-        $this->content .= file_get_contents(Globals::$project_path.$file);
+        $this->content .= file_get_contents($file);
     }
     function DefineBlock($blockName){
 
@@ -21,6 +22,7 @@ class Template {
         $endOfBlockPos = strpos($this->content,"<!-- END ".$blockName." -->");
         $length = $endOfBlockPos - $beginOfBlockPos;
         $block = substr($this->content,$beginOfBlockPos, $length);
+
         $this->blocks["$blockName"] = new Block($block);
     }
 
@@ -36,13 +38,13 @@ class Template {
         $tempContent = $this->blocks["$blockName"]->content;
         }
         $vars = $this->blocks["$blockName"]->vars;
+
         if(isset($vars)){
             foreach($vars as $toReplace => $value){
                 $tempContent = str_replace("{{".$toReplace."}}",$value,$tempContent);
    
             }
         }
-        
         return $this->RemoveVars($tempContent);
         //return $tempContent;
     }
