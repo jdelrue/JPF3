@@ -67,17 +67,24 @@ abstract class Entity {
         }
     }
 
-    static function SelectColumns($columns, $args = "", $order = NULL, $limitor = "") {
+   static function SelectColumns($columns, $args = "", $order = NULL, $limitor = "") {
 
 
         $joins = "";
+        $joinedList = Array(); //list of joins already done
         $newColumns = Array();
         foreach($columns as $column){
             if (strpos($column, ':') !== false) {
                 $seperated = explode(':', $column);
-                $tableName = str_replace("ID", "", $seperated[0]);
-                $idField = $tableName.".ID";
-                $joins .= sprintf(" join `%s` on %s = %s", $tableName, $seperated[0], $idField);
+                 $tableName = str_replace("ID", "", $seperated[0]);
+                    $idField = $tableName.".ID";
+                if(!isset($joinedList[$tableName])){
+                    $joins .= sprintf(" join `%s` on %s = %s", $tableName, $seperated[0], $idField);
+                    $joinedList[$tableName] = true;
+                }
+               
+                
+               
                 $fieldName = sprintf("%s.%s as %s%s",$tableName,$seperated[1], $tableName, $seperated[1]);
                 array_push($newColumns, $fieldName);
             }else{
@@ -109,6 +116,7 @@ abstract class Entity {
 
 
     }
+
     /*
      * Get an array of objects from a table. This will create objects using the generated
      * entity classes.
