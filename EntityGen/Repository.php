@@ -71,7 +71,7 @@ abstract class Repository {
             }
             $stmt->close();
         }
-        $mysqli->close();
+
         return $result;
 
     }
@@ -125,11 +125,8 @@ abstract class Repository {
              if(isset($stmt->error)){
                  return array($stmt->error, null);
              }
-            /* close statement */
             $stmt->close();
         }
-        /* close connection */
-        $mysqli->close();
         return $result;
 
     }
@@ -180,11 +177,8 @@ public function Update($object){
              if(isset($stmt->error)){
                  return array($stmt->error, null);
              }
-            /* close statement */
             $stmt->close();
         }
-        /* close connection */
-        $mysqli->close();
         return $result;
 
     
@@ -231,13 +225,9 @@ public function Update($object){
              if(isset($stmt->error)){
                  return array($stmt->error, null);
              }
-
-            /* close statement */
             $stmt->close();
         }
 
-        /* close connection */
-        $mysqli->close();
         return array(true, null);
 
     }
