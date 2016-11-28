@@ -40,6 +40,7 @@ class Generator {
 				} else { //finish last table
 			
 					$entityfile .= $this->AddEndOfClass($regex);
+					$entityfile .= $this->AddRepository($currentClass);
 					$regex = "";
 				}
 				$entityfile .= "class " . $matches[1] . " extends Entity {";
@@ -49,7 +50,7 @@ class Generator {
 			}
 		}
 		$entityfile .= $this->AddEndOfClass($regex);
-		$entityfile .= "\n?>";
+		$entityfile .= $this->AddRepository($currentClass);
 		return $entityfile;
 	}
 
@@ -65,6 +66,15 @@ class Generator {
 					$entityfile .= "}\n";
 
 					return $entityfile;
+	}
+	private function AddRepository($class){
+		$entityFile = "\n";
+		$entityFile .= "class ".$class."Repository extends Repository{\n";
+		$entityFile .= "\tfunction __construct() {\n";
+		$entityFile .= "\t\t parent::__construct(\"".$class."\");\n";
+    	$entityFile .= "\t}\n";
+		$entityFile .= "}\n";
+		return $entityFile;
 	}
 };
 

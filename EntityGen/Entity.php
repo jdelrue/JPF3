@@ -5,7 +5,7 @@ abstract class Entity {
     private $fields = Array();
     private $entityType;
     private $deleted;
-
+protected $primaryKeys;
 
     /*
      * Following things can be passed to the constructor:
@@ -214,7 +214,7 @@ abstract class Entity {
         }
     }
 
-    private function GetFields() {
+    public function GetFields() {
         $list = "";
         foreach ($this->fields as $key => $value) {
             if ($this->checkRealColumn($value)) {
@@ -301,7 +301,9 @@ abstract class Entity {
 
         return $where;
     }
-
+    public function GetKeys(){
+        return $this->primaryKeys;
+    }
     /*
      * The values can be used with a colon as seperator to find values
      * in linked tables. 
