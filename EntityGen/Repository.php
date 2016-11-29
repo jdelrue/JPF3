@@ -15,6 +15,10 @@ abstract class Repository {
     public function FindOne($filter = array()){
         return $this->Find($filter, 1);
     }
+    private function isRegex($str0) {
+        $regex = "/^\/[\s\S]+\/$/";
+        return preg_match($regex, $str0);
+    }
     public function Find($filter = array(), $limit = null){
         $class = "JPF\\EntityGen\\".$this->tableName;
 
@@ -28,12 +32,26 @@ abstract class Repository {
             $filterStr .= " WHERE ";
         }
         $first = true;
-        foreach($filter as $key => $value){
+        foreach($filter as $key => &$value){
+
+
             if($first){
-            $filterStr .= $key."=? ";
-            $first = false; 
+                if(isRegex($value)){
+                    $filterStr .= $key."REGEXP ? ";
+                    $first = false; 
+                    $value = substr($value,1,-1);
+                }else{
+                    $filterStr .= $key."=? ";
+                    $first = false; 
+                }
             }else{
-                $filterStr .= "AND ". $key."=? ";
+                if(isRegex($value)){
+                    $filterStr .= "AND ". $key."REGEXP ? ";
+                    $value = substr($value,1,-1); //remove trailing and beginning /
+                }else{
+                    $filterStr .= "AND ". $key."=? ";
+                }
+
             }
         }
         $limitStr = "";
