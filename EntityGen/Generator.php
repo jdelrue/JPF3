@@ -25,7 +25,7 @@ class Generator {
 
 			}
 			if (preg_match("/^\s+PRIMARY KEY \((.+)\).*/", $line, $matches)) {
-				$entityfile .= "\t var \$primaryKeys = array(" . str_replace("`", "\"", $matches[1]) . ");\n";
+				$entityfile .= "\t protected \$primaryKeys = array(" . str_replace("`", "\"", $matches[1]) . ");\n";
 			}
 			if (preg_match("/^.+AUTO_INCREMENT,$/", $line, $matches)) {
 	
@@ -58,7 +58,7 @@ class Generator {
 					$entityfile = "";
 					if($regex != ""){
 				
-					$regex = "\tvar \$auto_increment = array(".substr_replace($regex, "", -1).");\n";
+					$regex = "\tprotected \$auto_increment = array(".substr_replace($regex, "", -1).");\n";
 									$entityfile .= $regex;
 					}
 		

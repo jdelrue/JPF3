@@ -37,7 +37,7 @@ abstract class Repository {
 
             if($first){
                 if(isRegex($value)){
-                    $filterStr .= $key."REGEXP ? ";
+                    $filterStr .= $key." REGEXP ? ";
                     $first = false; 
                     $value = substr($value,1,-1);
                 }else{
@@ -46,7 +46,7 @@ abstract class Repository {
                 }
             }else{
                 if(isRegex($value)){
-                    $filterStr .= "AND ". $key."REGEXP ? ";
+                    $filterStr .= "AND ". $key." REGEXP ? ";
                     $value = substr($value,1,-1); //remove trailing and beginning /
                 }else{
                     $filterStr .= "AND ". $key."=? ";
