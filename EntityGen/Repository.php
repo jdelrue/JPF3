@@ -70,8 +70,8 @@ abstract class Repository {
                     $arrBp[0] = "";
             
                 
-                foreach($filter as $key => $value){
-                    $arrBp[0] .= $this->GetType($value);
+                foreach($filter as $key => $valuebp){
+                    $arrBp[0] .= $this->GetType($valuebp);
                     $arrBp[$key] = &$filter[$key];
                 }
                 call_user_func_array(array($stmt, 'bind_param'), $arrBp);
