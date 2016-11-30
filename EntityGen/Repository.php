@@ -77,7 +77,7 @@ abstract class Repository {
                 call_user_func_array(array($stmt, 'bind_param'), $arrBp);
             }
              $stmt->execute();
-             if(isset($stmt->error) || $stmt->error == ""){
+             if(isset($stmt->error) && $stmt->error != ""){
                  return array(null, $stmt->error);
              }
             $arr = array();
@@ -147,7 +147,7 @@ abstract class Repository {
             }
             call_user_func_array(array($stmt, 'bind_param'), $arrBp);
              $stmt->execute();
-             if(isset($stmt->error) && $stmt->error == ""){
+             if(isset($stmt->error) && $stmt->error != ""){
                  return array(null, $stmt->error);
              }
             $stmt->close();
@@ -199,7 +199,7 @@ public function Update($object){
             }
             call_user_func_array(array($stmt, 'bind_param'), $arrBp);
              $stmt->execute();
-             if(isset($stmt->error) || $stmt->error == ""){
+             if(isset($stmt->error) && $stmt->error != ""){
                  return array(null, $stmt->error);
              }
             $stmt->close();
@@ -247,7 +247,7 @@ public function Update($object){
                 call_user_func_array(array($stmt, 'bind_param'), $arrBp);
             }
             $stmt->execute();
-             if(isset($stmt->error) || $stmt->error == ""){
+             if(isset($stmt->error) && $stmt->error != ""){
                  return array(null, $stmt->error);
              }
             $stmt->close();
