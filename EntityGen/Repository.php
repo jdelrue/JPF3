@@ -12,13 +12,15 @@ abstract class Repository {
     }
 
 
-    public function FindOne($filter = array()){
-        $arr = $this->Find($filter, 1);
+   public function FindOne($filter = array()){
+        list($arr, $error) = $this->Find($filter, 1);
         if(isset($arr[0])){
-            return $arr[0];
+
+            return array($arr[0], null);
         }
-        return null;
+        return array(null, $error);
     }
+    
     private function isRegex($str0) {
         $regex = "/^\/[\s\S]+\/$/";
         return preg_match($regex, $str0);
@@ -97,7 +99,7 @@ abstract class Repository {
             $stmt->close();
         }
 
-        return $result;
+        return array($result,null);
 
     }
 
