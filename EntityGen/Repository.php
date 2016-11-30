@@ -77,6 +77,9 @@ abstract class Repository {
                 call_user_func_array(array($stmt, 'bind_param'), $arrBp);
             }
              $stmt->execute();
+             if(isset($stmt->error) || $stmt->error == ""){
+                 return array(null, $stmt->error);
+             }
             $arr = array();
             foreach($object as $key => $value){
 
@@ -144,12 +147,12 @@ abstract class Repository {
             }
             call_user_func_array(array($stmt, 'bind_param'), $arrBp);
              $stmt->execute();
-             if(isset($stmt->error)){
-                 return array($stmt->error, null);
+             if(isset($stmt->error) && $stmt->error == ""){
+                 return array(null, $stmt->error);
              }
             $stmt->close();
         }
-        return $result;
+        return array($object, null);
 
     }
 
@@ -196,12 +199,12 @@ public function Update($object){
             }
             call_user_func_array(array($stmt, 'bind_param'), $arrBp);
              $stmt->execute();
-             if(isset($stmt->error)){
-                 return array($stmt->error, null);
+             if(isset($stmt->error) || $stmt->error == ""){
+                 return array(null, $stmt->error);
              }
             $stmt->close();
         }
-        return $result;
+        return array($object, null);
 
     
     }
@@ -244,8 +247,8 @@ public function Update($object){
                 call_user_func_array(array($stmt, 'bind_param'), $arrBp);
             }
             $stmt->execute();
-             if(isset($stmt->error)){
-                 return array($stmt->error, null);
+             if(isset($stmt->error) || $stmt->error == ""){
+                 return array(null, $stmt->error);
              }
             $stmt->close();
         }
