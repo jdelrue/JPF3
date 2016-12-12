@@ -20,7 +20,6 @@ abstract class Repository {
         }
         return array(null, $error);
     }
-    
     private function isRegex($str0) {
         $regex = "/^\/[\s\S]+\/$/";
         return preg_match($regex, $str0);
