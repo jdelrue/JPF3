@@ -68,12 +68,27 @@ class Generator {
 					return $entityfile;
 	}
 	private function AddRepository($class){
+
 		$entityFile = "\n";
-		$entityFile .= "class ".$class."Repository extends Repository{\n";
+		$entityFile .= "interface ".$class."RepositoryInterface {\n";
+		$entityFile .= "\tpublic function FindOne(\$filter = array());\n";
+		$entityFile .= "\tpublic function Find(\$filter = array(), \$limit = null);\n";
+		$entityFile .= "\tpublic function PutMany(\$array);\n";
+		$entityFile .= "\tpublic function Put(\$object);\n";
+		$entityFile .= "\tpublic function Update(\$object);\n";
+		$entityFile .= "}\n";
+
+
+		$entityFile .= "\n";
+		$entityFile .= "class ".$class."Repository extends Repository implements ".$class."RepositoryInterface {\n";
 		$entityFile .= "\tfunction __construct() {\n";
 		$entityFile .= "\t\t parent::__construct(\"".$class."\");\n";
     	$entityFile .= "\t}\n";
 		$entityFile .= "}\n";
+
+
+
+       
 		return $entityFile;
 	}
 };
