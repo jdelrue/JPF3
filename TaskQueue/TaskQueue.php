@@ -42,7 +42,7 @@ class TaskQueue {
                     $taskArr = unserialize($task);
 
                     $instanceOfClass = $container->Get($taskArr[0]);
-                    $method = $container->Get($taskArr[1]);
+                    $method = $taskArr[1];
 
                     list($result, $error) = $instanceOfClass->$method;
 
