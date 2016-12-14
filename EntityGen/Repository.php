@@ -63,7 +63,7 @@ abstract class Repository {
         if(isset($limit)){
             $limitStr = " LIMIT ".$limit;
         }
-        $query = "SELECT $fields FROM ".basename($this->tableName)." ".$filterStr." ".$limitStr;
+        $query = "SELECT $fields FROM ".basename(str_replace('\\','/',$this->tableName))." ".$filterStr." ".$limitStr;
         $result = Array();
         if ($stmt = $mysqli->prepare($query)) {
             $arrBp = array();
@@ -135,7 +135,7 @@ abstract class Repository {
              }
                 
         }
-        $query = "INSERT into ".basename($this->tableName)."(".$fields.") VALUES(".$valuesStr.")";
+        $query = "INSERT into ".basename(str_replace('\\','/',$this->tableName))."(".$fields.") VALUES(".$valuesStr.")";
         $result = Array();
         if ($stmt = $mysqli->prepare($query)) {
             $arrBp = array();
@@ -167,7 +167,11 @@ public function Update($object){
 
         foreach($object as $key => $value){
 
-             $arrParam[$key] = $value;
+            if($key === "primaryKeys"){
+                continue;
+            }
+
+            $arrParam[$key] = $value;
             if($first){
                 $first = false;
                 $valuesStr .= $key."=?";
@@ -186,9 +190,10 @@ public function Update($object){
              }
            
         }
-        $query = "UPDATE ".basename($this->tableName)." SET ".$valuesStr." ".$where;
+        $query = "UPDATE ".basename(str_replace('\\','/',$this->tableName))." SET ".$valuesStr." ".$where;
         $stmt = $mysqli->prepare($query);
         $result = Array();
+
         if ($stmt = $mysqli->prepare($query)) {
 
             $arrBp = array();
@@ -232,7 +237,7 @@ public function Update($object){
                 $filterStr .= "AND ". $key."=? ";
             }
         }
-        $query = "DELETE FROM ".basename($this->tableName)." ".$filterStr;
+        $query = "DELETE FROM ".basename(str_replace('\\','/',$this->tableName))." ".$filterStr;
         $result = Array();
         if ($stmt = $mysqli->prepare($query)) {
             $arrBp = array();
