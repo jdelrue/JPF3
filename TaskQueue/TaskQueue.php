@@ -15,6 +15,17 @@ class TaskQueue {
 
 
     }
+    public function Initialize($arrayOfVars){
+        echo " IN HERE";
+        foreach($arrayOfVars as $var){
+            echo $var[0];
+
+            $$var[0] = $var[1];
+            echo "HOST: ".$_SERVER['HTTP_HOST'];
+
+        }
+        exit(0);
+    }
 
     public function Add($task, $params, $maxRetries = 5, $date = null){
         if($date == null){
