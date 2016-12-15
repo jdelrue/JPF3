@@ -184,9 +184,12 @@ public function Update($object){
         $first = true;
         foreach($keys as $key){
              if($first){
-                  $where .= $key."=".$object->$key;
+                  $where .= $key."=?"; //.$object->$key
+                  $first = false;
+                  $arrParam[$key."key"] = $object->$key;
              }else{
-                 $where .= "AND ".$key."=".$object->$key;
+                 $where .= "AND ".$key."=?"; //$object->$key;
+                    $arrParam[$key."key"] = $object->$key;
              }
            
         }
