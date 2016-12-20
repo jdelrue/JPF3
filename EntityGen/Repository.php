@@ -147,10 +147,13 @@ abstract class Repository {
                 $arrBp[$key] = &$arrParam[$key];
             }
             call_user_func_array(array($stmt, 'bind_param'), $arrBp);
-             $stmt->execute();
-             if(isset($stmt->error) && $stmt->error != ""){
-                 return array(null, $stmt->error);
-             }
+            $stmt->execute();
+            if(isset($stmt->error) && $stmt->error != ""){
+                return array(null, $stmt->error);
+            }
+            if(property_exists($object, "ID")){
+                $object->ID = $stmt->insert_id;
+            }
             $stmt->close();
         }
         return array($object, null);
