@@ -64,7 +64,7 @@ abstract class Repository {
             $limitStr = " LIMIT ".$limit;
         }
         $query = "SELECT $fields FROM ".basename(str_replace('\\','/',$this->tableName))." ".$filterStr." ".$limitStr;
-  
+
         $result = Array();
         if ($stmt = $mysqli->prepare($query)) {
             $arrBp = array();
@@ -151,10 +151,13 @@ abstract class Repository {
                 $arrBp[$key] = &$arrParam[$key];
             }
             call_user_func_array(array($stmt, 'bind_param'), $arrBp);
-             $stmt->execute();
-             if(isset($stmt->error) && $stmt->error != ""){
-                 return array(null, $stmt->error);
-             }
+            $stmt->execute();
+            if(isset($stmt->error) && $stmt->error != ""){
+                return array(null, $stmt->error);
+            }
+            if(property_exists($object, "ID")){
+                $object->ID = $stmt->insert_id;
+            }
             $stmt->close();
         }
         
@@ -191,6 +194,7 @@ public function Update($object){
             if($value == ''){
                 $value = null;
             }
+
             $arrParam[$key] = $value;
             if($first){
                 $first = false;

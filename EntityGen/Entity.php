@@ -92,9 +92,8 @@ protected $primaryKeys;
             }
         }
         $columnstring = implode(",", $newColumns);
-
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = sprintf("Select %s from `%s` %s %s",$columnstring,  basename(static::getClass()), $joins, $args);
+        $sqlstr = sprintf("Select %s from `%s` %s %s",$columnstring,  basename(str_replace('\\','/',static::getClass())), $joins, $args);
         //echo $sqlstr;
         if (isset($order)) {
 
@@ -121,10 +120,9 @@ protected $primaryKeys;
      * Get an array of objects from a table. This will create objects using the generated
      * entity classes.
      */
-
     static function Select($args = "", $order = NULL, $limitor = "") {
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = "Select * from `" . basename(static::getClass()) . "` $args";
+        $sqlstr = "Select * from `" . basename(str_replace('\\','/',static::getClass())) . "` $args";
         if (isset($order)) {
             $orderstr = $order->BuildOrder();
             $sqlstr = "select * from ($sqlstr) as t ORDER BY" . $orderstr;
@@ -176,10 +174,9 @@ protected $primaryKeys;
     /*
      * Delete current record from the database.
      */
-
     public function Delete() {
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = "delete from ".basename($this->entityType)." where " . $this->getWhere();
+        $sqlstr = "delete from ".basename(str_replace('\\','/',$this->entityType))." where " . $this->getWhere();
      
         if (!$mysqli->query($sqlstr) && GlobalVars::getDebug()) {
             echo $mysqli->error;
@@ -193,7 +190,7 @@ protected $primaryKeys;
     public function Add() {
 
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = "insert into `" . basename($this->entityType) . "`(" . $this->GetNonNullFields() . ")" . " VALUES(" . $this->GetValues() . ")";
+        $sqlstr = "insert into `" .basename(str_replace('\\','/',$this->entityType)) . "`(" . $this->GetNonNullFields() . ")" . " VALUES(" . $this->GetValues() . ")";
 
         if (!$mysqli->query($sqlstr)) {
             echo $mysqli->error;
@@ -207,7 +204,7 @@ protected $primaryKeys;
 
     public function Edit() {
         $mysqli = SqlConnector::getMysqliInstance();
-        $sqlstr = "update " . basename($this->entityType) . " SET " . $this->GetUpdateList() . " WHERE " . $this->getWhere();
+        $sqlstr = "update " .basename(str_replace('\\','/',$this->entityType)) . " SET " . $this->GetUpdateList() . " WHERE " . $this->getWhere();
 
         if (!$mysqli->query($sqlstr)) {
             echo $mysqli->error;
