@@ -15,6 +15,16 @@ class TaskQueue {
 
 
     }
+    public function Initialize($arrayOfVars){
+        foreach($arrayOfVars as $var){
+            echo $var[0];
+
+            $$var[0] = $var[1];
+            echo "HOST: ".$_SERVER['HTTP_HOST'];
+
+        }
+        exit(0);
+    }
 
     public function Add($task, $params, $maxRetries = 5, $date = null){
         if($date == null){
@@ -34,8 +44,10 @@ class TaskQueue {
  
         $taskQueueEntry = new TaskQueueData(0, $date, $task, $params, 0,$maxRetries, 0);
         list($result, $error) = $this->taskQueueRepository->put($taskQueueEntry);
-
-        return array($result, $error);
+        if(isset($error)){
+            return array(null, $error);
+        }
+        return array($result, null);
 
     }
 
@@ -51,17 +63,22 @@ class TaskQueue {
                     $params = unserialize($task->Params);
                     list($result, $error) = call_user_func_array(array($instanceOfClass, $method), $params);
 
-                    echo "Executed task ".$taskArr[0]."->".$method." params ".json_encode($params)."\n";
+                  
 
                     if($error){
+                          echo "ERROR: Executed task ".$taskArr[0]."->".$method." params ".json_encode($params)."\n";
                         $task->Retries += 1;
                         $datetime = new \DateTime($task->Date);
                         $datetime->modify('+2 hours');
                         $task->Date = $datetime->format('Y-m-d H:i');
+                        if(!is_scalar($error)){
+                            $error = json_encode($error);
+                        }
                         $task->LastError = $error;
                         $this->taskQueueRepository->Update($task);
 
                     }else{
+                          echo "Executed task ".$taskArr[0]."->".$method." params ".json_encode($params)."\n";
                          $this->taskQueueRepository->Delete(array("ID" => $task->ID));
                     }
 
