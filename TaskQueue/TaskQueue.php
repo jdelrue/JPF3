@@ -56,6 +56,9 @@ class TaskQueue {
         while($this->running){
             list($queue, $error) = $this->taskQueueRepository->Find();
             foreach($queue as $task){
+                if($task->Retries >= $task->MaxRetries){
+                    continue;
+                }
                 if($task->Date <= date("Y-m-d H:i:s")){
                     $taskArr = unserialize($task->Task);
                     $instanceOfClass = $container->Get($taskArr[0]);
@@ -63,19 +66,23 @@ class TaskQueue {
                     $params = unserialize($task->Params);
                     list($result, $error) = call_user_func_array(array($instanceOfClass, $method), $params);
 
-                  
-
                     if($error){
-                          echo "ERROR: Executed task ".$taskArr[0]."->".$method." params ".json_encode($params)."\n";
-                        $task->Retries += 1;
-                        $datetime = new \DateTime($task->Date);
-                        $datetime->modify('+2 hours');
-                        $task->Date = $datetime->format('Y-m-d H:i');
+                    try{
+                        $error = $error->GetMessage();
+                    }catch(\Exception $e){
                         if(!is_scalar($error)){
                             $error = json_encode($error);
                         }
-                        $task->LastError = $error;
-                        $this->taskQueueRepository->Update($task);
+                    }
+
+                    echo "ERROR: Executed task ".$taskArr[0]."->".$method." params ".json_encode($params)." Got error:".$error." \n";
+                    $task->Retries += 1;
+                    $datetime = new \DateTime($task->Date);
+                    $datetime->modify('+2 hours');
+                    $task->Date = $datetime->format('Y-m-d H:i');
+                    
+                    $task->LastError = $error;
+                    $this->taskQueueRepository->Update($task);
 
                     }else{
                           echo "Executed task ".$taskArr[0]."->".$method." params ".json_encode($params)."\n";
