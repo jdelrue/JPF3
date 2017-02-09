@@ -1,6 +1,6 @@
 <?php
-$options = getopt("",array("bootstrap::","dbHost::","dbUser::", "dbPass::", "dbName::", "task:", "params:", "maxRetries::", "date::"));
-
+$options = getopt("",array("bootstrap:","dbHost:","dbUser:", "dbPass:", "dbName:", "task:", "params:", "maxRetries::", "date:"));
+print_r($options);
 if(isset($options["dbHost"])){
     $_ENV["Db"]["Host"] = $options["dbHost"];
 }
@@ -13,11 +13,11 @@ if(isset($options["dbPass"])){
 if(isset($options["dbName"])){
     $_ENV["Db"]["Name"] = $options["dbName"];
 }
-
+$params = null;
 $task = json_decode($options["task"]);
-
-$params = json_decode($options["params"]);
-
+if(isset($options["params"])){
+    $params = json_decode($options["params"]);
+}
 $maxRetries = 5;
 $date = null;
 if(isset($options["maxRetries"])){
