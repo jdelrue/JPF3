@@ -6,9 +6,10 @@ use  JPF\EntityGen\Entity;
 abstract class Repository {
 
     private $tableName;
-
-    public function __construct($tableName) {
+    private $dbhooks;
+    public function __construct($tableName, DbHooksInterface $dbhooks = null) {
       $this->tableName = $tableName;
+      $this->dbhooks = $dbhooks;
     }
 
 
@@ -64,7 +65,7 @@ abstract class Repository {
             $limitStr = " LIMIT ".$limit;
         }
         $query = "SELECT $fields FROM ".basename(str_replace('\\','/',$this->tableName))." ".$filterStr." ".$limitStr;
-  
+
         $result = Array();
         if ($stmt = $mysqli->prepare($query)) {
             $arrBp = array();
@@ -97,6 +98,10 @@ abstract class Repository {
               
             }
             $stmt->close();
+        }else{
+
+            return array(null, "Error cannot prepare statement for DB");
+
         }
 
         return array($result,null);
@@ -110,7 +115,7 @@ abstract class Repository {
             }
             return array(true, null);
         }
-        return array("Error: not an array", null); //@todo error class
+        return array( null, "Error: not an array"); //@todo error class
     }
     public function Put($object){
         $class = $this->tableName;
@@ -141,7 +146,6 @@ abstract class Repository {
         }
         $query = "INSERT into ".basename(str_replace('\\','/',$this->tableName))."(".$fields.") VALUES(".$valuesStr.")";
         $result = Array();
-
         if ($stmt = $mysqli->prepare($query)) {
             $arrBp = array();
 
@@ -152,25 +156,28 @@ abstract class Repository {
                 $arrBp[$key] = &$arrParam[$key];
             }
             call_user_func_array(array($stmt, 'bind_param'), $arrBp);
-             $stmt->execute();
-             if(isset($stmt->error) && $stmt->error != ""){
-            
-                 return array(null, $stmt->error);
-             }
+            $stmt->execute();
+            if(isset($stmt->error) && $stmt->error != ""){
+                return array(null, $stmt->error);
+            }
+            if(property_exists($object, "ID")){
+                $object->ID = $stmt->insert_id;
+            }
             $stmt->close();
         }
-        if(isset($mysqli->error) && $mysqli->error != ""){
         
-                return array(null, $mysqli->error);
-        }
         if(isset($object->ID)){
             $object->ID = $mysqli->insert_id; 
         }else if( isset($object->id)){
+            $object->ID = $mysqli->insert_id; 
             $object->id = $mysqli->insert_id; 
         }else if( isset($object->Id)){
-            $object->id = $mysqli->insert_id; 
+            $object->ID = $mysqli->insert_id; 
+            $object->Id = $mysqli->insert_id; 
         }
-
+        if($this->dbhooks != null){
+            $this->dbhooks->PutHook(basename(str_replace('\\','/',$this->tableName)), $object->ID);
+        }
         return array($object, null);
 
     }
@@ -196,6 +203,7 @@ public function Update($object){
             if($value == ''){
                 $value = null;
             }
+
             $arrParam[$key] = $value;
             if($first){
                 $first = false;
