@@ -12,6 +12,7 @@ class TaskQueue extends Entity {
 	 var $MaxRetries;
 	 var $Done;
 	 var $LastError;
+	 var $Fallback;  
 	 protected $primaryKeys = array("ID");
 	protected $auto_increment = array("ID");
 public static function getClass() { return __CLASS__; }

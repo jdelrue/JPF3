@@ -13,5 +13,6 @@
                     `MaxRetries` int NOT NULL,
                     `Done` boolean NOT NULL,
                     `LastError` NULL,
+					`Fallback` JSON NULL,
                     PRIMARY KEY (`ID`)
                     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
