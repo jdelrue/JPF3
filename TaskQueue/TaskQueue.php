@@ -58,7 +58,7 @@ class TaskQueue {
             foreach($queue as $task){
                 if(!$task->Done){
                     if($task->Retries >= $task->MaxRetries){
-                        if(isset($task->Fallback)){
+                        if(isset($task->Fallback) && $task->Fallback != ""){
                             echo"Adding fallback to queue\n";
                             $fb = json_decode($task->Fallback);
                             $fbtask = $fb->Task;
