@@ -16,7 +16,8 @@ if(isset($options["dbName"])){
 
 require_once $options["bootstrap"];
 
-require_once "TaskQueue.php";
+require_once "Cron.php";
 
-$taskQueue = $container->Get("JPF\TaskQueue\TaskQueue");
-$taskQueue->Start();
+$cron = $container->Get("JPF\Cron\Cron");
+$cron->Start();
+//Ivan
