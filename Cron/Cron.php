@@ -54,36 +54,56 @@ class Cron {
     public function Start(){
         global $container;
         while($this->running){
+            $config = $container->Get($_ENV["Config"]);
+            $jobs = $config->getValue("CronJobs");
             list($queue, $error) = $this->cronRepository->Find();
+            $queueOfArra=[];
             foreach($queue as $task){
-                    if($task->Date <= date("Y-m-d H:i:s")){
-                        $taskArr = unserialize($task->Task);
-                        $instanceOfClass = $container->Get($taskArr[0]);
-                        $method = $taskArr[1];
-                        $params = unserialize($task->Params);
-                        list($result, $error) = $instanceOfClass->$method($params);
-                        // list($result, $error) = call_user_func_array(array($instanceOfClass, $method), $params);
-
-                        if($error){
-                            try{
-                                $error = $error->GetMessage();
-                            }catch(\Exception $e){
-                                if(!is_scalar($error)){
-                                    $error = json_encode($error);
-                                }
+                $taskArr = unserialize($task->Task);
+                array_push($queueOfArra,$taskArr[0] );
+                if($task->Date <= date("Y-m-d H:i:s")){
+                    $instanceOfClass = $container->Get($taskArr[0]);
+                    $method = $taskArr[1];
+                    $params = unserialize($task->Params);
+                    list($result, $error) = $instanceOfClass->$method(new \DateTime($task->Date));
+                    if($error){
+                        try{
+                            $error = $error->GetMessage();
+                        }catch(\Exception $e){
+                            if(!is_scalar($error)){
+                                $error = json_encode($error);
                             }
-
-                            echo "ERROR: Executed job ".$taskArr[0]."->".$method." params ".json_encode($params)." Got error:".$error." \n";
-                        }else{
-                            echo "Executed job ".$taskArr[0]."->".$method." params ".json_encode($params)."\n";
-                            echo "RESULT: " . json_encode($result) . "\n\n";
                         }
-                        $datetime = new \DateTime(date('m/d/Y h:i:s a', time()));
-                        $datetime->add(new \DateInterval('PT' . $task->NextExcIn));
+
+                        echo "ERROR: Executed job ".$taskArr[0]."->".$method." params ".json_encode($params)." Got error:".$error." \n";
+                    }
+                    else{
+                        echo "Executed job ".$taskArr[0]."->".$method." params ".json_encode($params)."\n";
+                        echo "RESULT: " . json_encode($result) . "\n\n";
+                    }
+                    //Only add to db if still in config
+                    if (isset($jobs[$taskArr[0]])){
+                        //TODO: Execute X times (if it was down, you still need data)
+                        $datetime = new \DateTime($task->Date);
+                        $datetime->add(new \DateInterval('P' . $jobs[$taskArr[0]]));
                         $task->Date = $datetime->format('Y-m-d H:i');
                         $this->cronRepository->Update($task);
-
+                    }//else delte cron
+                    else{
+                        $this->cronRepository->Delete($task);
                     }
+                    unset($jobs[$taskArr[0]]);
+                    
+                }
+            }
+            foreach($jobs as $jobInteration => $nextExecution){
+                //If not in already in cron
+                if(!in_array($jobInteration, $queueOfArra)){       
+                    //add ron
+                    $dateToExecute = new \DateTime(date('m/d/Y h:i:s a', time()));
+                    $dateToExecute->add(new \DateInterval('P' . $nextExecution));
+                    list($ok, $error) = $this->Add(array($jobInteration,"Handle"), null, $nextExecution );
+                }
             }
             sleep(10);
         }  
