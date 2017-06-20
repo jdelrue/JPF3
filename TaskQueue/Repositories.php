@@ -31,6 +31,6 @@ interface TaskQueueRepositoryInterface{
 
 class TaskQueueRepository extends Repository implements TaskQueueRepositoryInterface{
 	function __construct() {
-		 parent::__construct(__NAMESPACE__."\TaskQueue");
+		 parent::__construct(__NAMESPACE__."\\TaskQueue");
 	}
 }

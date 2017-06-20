@@ -27,6 +27,6 @@ interface CronRepositoryInterface{
 
 class CronRepository extends Repository implements CronRepositoryInterface{
 	function __construct() {
-		 parent::__construct(__NAMESPACE__."\Cron");
+		 parent::__construct(__NAMESPACE__."\\Cron");
 	}
 }
